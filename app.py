@@ -716,6 +716,10 @@ def init_db():
     """Initialize the database."""
     with app.app_context():
         db.create_all()
+
+
 if __name__ == "__main__":
+    # Initialize the database and run the app (for local use)
     init_db()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
+
