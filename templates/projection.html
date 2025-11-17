@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-5">
+    <div class="card card-soft p-3">
+      <h5 class="mb-3">Projection Wall</h5>
+      {% if projection and projection_progress %}
+        <div class="small text-muted">
+          Active {{ projection.period_type }} goal<br>
+          {{ projection.start_date.strftime("%d %b %Y") }} – {{ projection.end_date.strftime("%d %b %Y") }}
+        </div>
+        <div class="mt-3">
+          <div class="d-flex justify-content-between small">
+            <span>Revenue</span>
+            <span>₹{{ "%.0f"|format(projection_progress.achieved_revenue) }} / ₹{{ "%.0f"|format(projection.target_revenue) }}</span>
+          </div>
+          <div class="progress mb-3" style="height:8px;">
+            <div class="progress-bar bg-success" style="width: {{ projection_progress.revenue_pct }}%;"></div>
+          </div>
+          <div class="d-flex justify-content-between small">
+            <span>Clients</span>
+            <span>{{ projection_progress.achieved_clients }} / {{ projection.target_clients_count }}</span>
+          </div>
+          <div class="progress mb-2" style="height:8px;">
+            <div class="progress-bar bg-info" style="width: {{ projection_progress.client_pct }}%;"></div>
+          </div>
+        </div>
+        {% if projection.description %}
+        <p class="small mt-2">{{ projection.description }}</p>
+        {% endif %}
+      {% else %}
+        <p class="small text-muted mb-0">No active projection. Create one to start tracking.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card card-soft p-3 mb-3">
+      <h6 class="mb-2">Create Projection</h6>
+      <form method="post" class="small">
+        <div class="row g-2">
+          <div class="col-md-4">
+            <label class="form-label">Period Type</label>
+            <select name="period_type" class="form-select form-select-sm">
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control form-control-sm" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control form-control-sm" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Target Revenue (₹)</label>
+            <input type="number" step="0.01" name="target_revenue" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Target Clients</label>
+            <input type="number" name="target_clients_count" class="form-control form-control-sm">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control form-control-sm" rows="2"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm mt-2" type="submit">Save</button>
+      </form>
+    </div>
+
+    <div class="card card-soft p-3 small">
+      <h6 class="mb-2">Past Projections</h6>
+      {% if all_projections %}
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Type</th>
+            <th>Target Revenue</th>
+            <th>Target Clients</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in all_projections %}
+          <tr>
+            <td>{{ p.start_date.strftime("%d %b %Y") }} – {{ p.end_date.strftime("%d %b %Y") }}</td>
+            <td>{{ p.period_type }}</td>
+            <td>₹{{ "%.0f"|format(p.target_revenue) }}</td>
+            <td>{{ p.target_clients_count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="text-muted mb-0">No projections created yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

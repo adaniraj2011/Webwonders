@@ -1,0 +1,76 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">Search</h4>
+<form class="mb-3" method="get">
+  <div class="input-group">
+    <input type="text" class="form-control" name="q" placeholder="Type client, task, invoice..." value="{{ q }}">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+</form>
+
+{% if q %}
+  <p class="small text-muted mb-3">Results for "<strong>{{ q }}</strong>"</p>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="card card-soft p-3 small">
+        <h6>Clients</h6>
+        {% if clients %}
+          <ul class="list-unstyled mb-0">
+          {% for c in clients %}
+            <li><a href="{{ url_for('planner') }}?client_id={{ c.id }}">{{ c.name }}</a></li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No matching clients.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-soft p-3 small">
+        <h6>Content Items</h6>
+        {% if content_items %}
+          <ul class="list-unstyled mb-0">
+          {% for i in content_items %}
+            <li>{{ i.date.strftime("%d %b") }} · {{ i.client.name }} · {{ i.title }}</li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No matching content.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-soft p-3 small">
+        <h6>Tasks</h6>
+        {% if tasks %}
+          <ul class="list-unstyled mb-0">
+          {% for t in tasks %}
+            <li>{{ t.title }} ({{ t.status }})</li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No matching tasks.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card card-soft p-3 small">
+        <h6>Invoices</h6>
+        {% if invoices %}
+          <ul class="list-unstyled mb-0">
+          {% for inv in invoices %}
+            <li>{{ inv.client.name }} · {{ inv.month }} · ₹{{ "%.0f"|format(inv.amount) }}</li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No matching invoices.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <p class="text-muted">Start by typing in the search box.</p>
+{% endif %}
+{% endblock %}

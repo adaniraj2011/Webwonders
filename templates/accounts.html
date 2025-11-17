@@ -1,0 +1,108 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Accounts & Ledgers</h4>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card card-soft p-3">
+      <h6 class="mb-2">Create Invoice</h6>
+      <form method="post" class="small">
+        <div class="mb-2">
+          <label class="form-label">Client *</label>
+          <select name="client_id" class="form-select form-select-sm" required>
+            <option value="">Select...</option>
+            {% for c in clients %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Month (YYYY-MM)</label>
+          <input type="month" name="month" class="form-control form-control-sm">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Amount (₹)</label>
+          <input type="number" name="amount" step="0.01" class="form-control form-control-sm">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Due Date</label>
+          <input type="date" name="due_date" class="form-control form-control-sm">
+        </div>
+        <button class="btn btn-primary btn-sm w-100" type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card card-soft p-3">
+      <form class="row g-2 align-items-end mb-2" method="get">
+        <div class="col-auto">
+          <label class="form-label small mb-0">Client</label>
+          <select name="client_id" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for c in clients %}
+            <option value="{{ c.id }}" {% if selected_client_id==c.id %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label small mb-0">Status</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for s in ['pending','paid','overdue'] %}
+            <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s|capitalize }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary btn-sm" type="submit">Filter</button>
+        </div>
+      </form>
+
+      {% if invoices %}
+      <table class="table table-sm small align-middle">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Month</th>
+            <th>Amount</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th style="width:120px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in invoices %}
+          <tr>
+            <td>{{ inv.client.name }}</td>
+            <td>{{ inv.month }}</td>
+            <td>₹{{ "%.0f"|format(inv.amount) }}</td>
+            <td>{{ inv.due_date.strftime("%d %b") }}</td>
+            <td>
+              <span class="badge rounded-pill
+                {% if inv.status=='paid' %}pill-done
+                {% elif inv.status=='overdue' %}pill-overdue
+                {% else %}pill-planned{% endif %}">
+                {{ inv.status|upper }}
+              </span>
+            </td>
+            <td class="text-end">
+              {% if inv.status != 'paid' %}
+              <a href="{{ url_for('accounts_pay', invoice_id=inv.id) }}" class="btn btn-sm btn-outline-success">Mark Paid</a>
+              {% else %}
+              <span class="small text-muted">Paid</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="small text-muted mb-0">No invoices yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

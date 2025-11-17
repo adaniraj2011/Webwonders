@@ -1,0 +1,119 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Tasks</h4>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card card-soft p-3">
+      <h6 class="mb-2">Create Task</h6>
+      <form method="post" class="small">
+        <div class="mb-2">
+          <label class="form-label">Title *</label>
+          <input type="text" name="title" class="form-control form-control-sm" required>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control form-control-sm" rows="2"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Client</label>
+          <select name="client_id" class="form-select form-select-sm">
+            <option value="">None</option>
+            {% for c in clients %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Assigned To</label>
+          <select name="assigned_to" class="form-select form-select-sm">
+            <option value="">Unassigned</option>
+            {% for e in employees %}
+            <option value="{{ e.id }}">{{ e.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Priority</label>
+          <select name="priority" class="form-select form-select-sm">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Due Date</label>
+          <input type="date" name="due_date" class="form-control form-control-sm">
+        </div>
+        <button class="btn btn-primary btn-sm w-100" type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card card-soft p-3">
+      <form class="row g-2 align-items-end mb-2" method="get">
+        <div class="col-auto">
+          <label class="form-label small mb-0">Status</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for s in ['pending','in_progress','completed','overdue'] %}
+            <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s|capitalize }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label small mb-0">Employee</label>
+          <select name="employee_id" class="form-select form-select-sm">
+            <option value="">All</option>
+            {% for e in employees %}
+            <option value="{{ e.id }}" {% if employee_id==e.id %}selected{% endif %}>{{ e.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary btn-sm" type="submit">Filter</button>
+        </div>
+      </form>
+
+      {% if tasks %}
+      <table class="table table-sm small align-middle">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Assignee</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th style="width:140px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in tasks %}
+          <tr>
+            <td>{{ t.title }}</td>
+            <td>{{ t.client.name if t.client_id else '-' }}</td>
+            <td>{{ t.assignee.name if t.assigned_to else '-' }}</td>
+            <td>{{ t.due_date.strftime("%d %b") if t.due_date else '-' }}</td>
+            <td>
+              <span class="badge bg-light text-dark text-uppercase">{{ t.status }}</span>
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('task_status', task_id=t.id, status='in_progress') }}" class="btn btn-outline-secondary">Progress</a>
+                <a href="{{ url_for('task_status', task_id=t.id, status='completed') }}" class="btn btn-outline-success">Done</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="small text-muted mb-0">No tasks yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-8">
+    <div class="card card-soft p-3">
+      <h5 class="mb-3">Super Calendar · Today</h5>
+      {% if todays_items %}
+        <ul class="list-group list-group-flush">
+          {% for i in todays_items %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">{{ i.client.name }} · {{ i.platform }} · {{ i.content_type }}</div>
+              <div class="small text-muted">{{ i.title }}</div>
+            </div>
+            <span class="badge rounded-pill 
+              {% if i.status=='planned' %}pill-planned
+              {% elif i.status=='done' %}pill-done
+              {% elif i.status=='overdue' %}pill-overdue
+              {% else %}pill-skipped{% endif %}">
+              {{ i.status|upper }}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No content scheduled for today.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-soft p-3 mb-3">
+      <h6 class="mb-1 text-muted text-uppercase small">Focus of the last 30 days</h6>
+      {% if top_client %}
+        <div class="fw-semibold">{{ top_client.client_name }}</div>
+        <div class="small text-muted">
+          {{ (top_client.total_minutes/60)|round(1) }} hours · {{ top_client.percentage }}% of your time
+        </div>
+      {% else %}
+        <p class="small text-muted mb-0">No effort data yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="card card-soft p-3">
+      <h6 class="mb-2 text-muted text-uppercase small">Overdue invoices</h6>
+      {% if overdue_invoices %}
+      <ul class="list-group list-group-flush">
+        {% for inv in overdue_invoices %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-semibold">{{ inv.client.name }}</div>
+            <div class="small text-muted">₹{{ "%.0f"|format(inv.amount) }} · due {{ inv.due_date.strftime("%d %b") }}</div>
+          </div>
+          <span class="badge rounded-pill pill-overdue">OVERDUE</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="small text-muted mb-0">No overdue invoices. Good going ✨</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-8">
+    <div class="card card-soft p-3">
+      <h5 class="mb-3">This Week's Pipeline</h5>
+      {% if weeks_items %}
+      <ul class="list-group list-group-flush small">
+        {% for i in weeks_items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge bg-light text-dark me-2">{{ i.date.strftime("%d %b") }}</span>
+            <span class="fw-semibold">{{ i.client.name }}</span>
+            · {{ i.platform }} · {{ i.content_type }}
+          </div>
+          <span class="badge rounded-pill 
+              {% if i.status=='planned' %}pill-planned
+              {% elif i.status=='done' %}pill-done
+              {% elif i.status=='overdue' %}pill-overdue
+              {% else %}pill-skipped{% endif %}">
+              {{ i.status|upper }}
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="text-muted mb-0">No items scheduled for this week yet.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-soft p-3 mb-3">
+      <h6 class="mb-2 text-muted text-uppercase small">Projection Wall</h6>
+      {% if projection and projection_progress %}
+        <div class="small text-muted">
+          {{ projection.period_type|capitalize }} goal:
+          {{ projection.start_date.strftime("%d %b") }} – {{ projection.end_date.strftime("%d %b") }}
+        </div>
+        <div class="mt-2">
+          <div class="d-flex justify-content-between small">
+            <span>Revenue</span><span>{{ projection_progress.revenue_pct }}%</span>
+          </div>
+          <div class="progress mb-2" style="height:8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ projection_progress.revenue_pct }}%;"></div>
+          </div>
+          <div class="d-flex justify-content-between small">
+            <span>Clients</span><span>{{ projection_progress.client_pct }}%</span>
+          </div>
+          <div class="progress" style="height:8px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{ projection_progress.client_pct }}%;"></div>
+          </div>
+        </div>
+      {% else %}
+        <p class="small text-muted mb-0">Set a projection to start tracking your goals visually.</p>
+      {% endif %}
+    </div>
+    <div class="card card-soft p-3">
+      <h6 class="mb-2 text-muted text-uppercase small">Overdue content</h6>
+      {% if overdue_items %}
+        <ul class="list-group list-group-flush small">
+        {% for i in overdue_items[:5] %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ i.client.name }}</div>
+            <div class="text-muted">{{ i.date.strftime("%d %b") }} · {{ i.platform }} · {{ i.content_type }}</div>
+          </li>
+        {% endfor %}
+        </ul>
+        {% if overdue_items|length > 5 %}
+          <div class="small text-muted mt-1">+ {{ overdue_items|length-5 }} more...</div>
+        {% endif %}
+      {% else %}
+        <p class="small text-muted mb-0">No overdue content. Nicely managed 👏</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
