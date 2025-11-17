@@ -713,12 +713,9 @@ def search():
 
 @app.cli.command("init-db")
 def init_db():
-"""Initialize the database."""
-    db.create_all()
-    print("Database created.")
-
-
-if __name__ == "__main__":
+    """Initialize the database."""
     with app.app_context():
         db.create_all()
+if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
