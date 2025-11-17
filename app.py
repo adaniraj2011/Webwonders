@@ -722,4 +722,3 @@ if __name__ == "__main__":
     # Initialize the database and run the app (for local use)
     init_db()
     app.run(host="0.0.0.0", port=5000)
-
