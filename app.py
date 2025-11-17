@@ -713,7 +713,7 @@ def search():
 
 @app.cli.command("init-db")
 def init_db():
-    \"\"\"Initialize the database.\"\"\"
+"""Initialize the database."""
     db.create_all()
     print("Database created.")
 
