@@ -8,6 +8,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///web_wonders.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "change_me_for_production"
 db = SQLAlchemy(app)
+# Create all tables automatically when the app starts (useful on Render)
+with app.app_context():
+    db.create_all()
 # ----------------------
 # Database Models
 # ----------------------
